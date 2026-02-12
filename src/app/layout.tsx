@@ -1,7 +1,8 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import { Geist, Geist_Mono, Permanent_Marker } from "next/font/google";
 import "./globals.css";
 import Navbar from "@/components/shared/navbar";
+import Footer from "@/components/shared/footer";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -12,6 +13,7 @@ const geistMono = Geist_Mono({
   variable: "--font-geist-mono",
   subsets: ["latin"],
 });
+
 
 export const metadata: Metadata = {
   title: "FoodExpress",
@@ -31,6 +33,7 @@ export default function RootLayout({
       >
         <Navbar></Navbar>
         {children}
+        <Footer></Footer>
       </body>
     </html>
   );
