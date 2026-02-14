@@ -29,6 +29,7 @@ import {
 import { Separator } from "@/components/ui/separator";
 import { Permanent_Marker } from "next/font/google";
 import { useState } from "react";
+import { UserService } from "@/services/user.service";
 
 interface NavbarProps {
   isLoggedIn?: boolean;
@@ -41,7 +42,7 @@ const font = Permanent_Marker({
 });
 
 export default function Navbar({
-  isLoggedIn = true,
+  isLoggedIn = false,
   cartItemCount = 0,
 }: NavbarProps) {
   const [open, setOpen] = useState(false);
@@ -122,12 +123,20 @@ export default function Navbar({
                 </Link>
               </Button>
             ) : (
-              <Button asChild>
+              <div className="flex gap-2">
+                <Button asChild>
                 <Link href="/login">
                   <User className="mr-2 h-4 w-4" />
                   Login
                 </Link>
               </Button>
+              <Button asChild>
+                <Link href="/register">
+                  <User className="mr-2 h-4 w-4" />
+                  Register
+                </Link>
+              </Button>
+              </div>
             )}
           </div>
 
@@ -195,12 +204,20 @@ export default function Navbar({
                     </Link>
                   </Button>
                 ) : (
-                  <Button className="w-full text-lg h-12" asChild>
-                    <Link href="/login" onClick={() => setOpen(false)}>
-                      <User className="mr-2 h-5 w-5" />
-                      Login
-                    </Link>
-                  </Button>
+                  <div className="flex gap-2">
+                    <Button className="w-full text-lg h-12" asChild>
+                      <Link href="/login" onClick={() => setOpen(false)}>
+                        <User className="mr-2 h-5 w-5" />
+                        Login
+                      </Link>
+                    </Button>
+                    <Button className="w-full text-lg h-12" asChild>
+                      <Link href="/register" onClick={() => setOpen(false)}>
+                        <User className="mr-2 h-5 w-5" />
+                        Register
+                      </Link>
+                    </Button>
+                  </div>
                 )}
               </div>
             </SheetContent>

@@ -1,5 +1,6 @@
 import { cookies } from "next/headers";
 import { env } from "../../env";
+import { authClient } from "@/lib/auth-client";
 
 const getSession = async () => {
   try {
@@ -17,6 +18,23 @@ const getSession = async () => {
     return { success: false, error: "Something went wrong" };
   }
 };
+
+const verifyEmail = async(token: string) =>{
+  try {
+    
+    const data = await re
+    if (res === null)
+      return { success: false, message: "Something went wrong" };
+
+     return { success: true, data: res };
+
+  
+    
+  } catch (error) {
+     return { success: false, error: "Something went wrong" };
+    
+  }
+}
 
 export const UserService = {
   getSession,
