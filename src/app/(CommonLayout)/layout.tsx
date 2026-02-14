@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono, Permanent_Marker } from "next/font/google";
-import "./globals.css";
+import "./../globals.css";
 import Navbar from "@/components/shared/navbar";
 import Footer from "@/components/shared/footer";
 
@@ -13,7 +13,6 @@ const geistMono = Geist_Mono({
   variable: "--font-geist-mono",
   subsets: ["latin"],
 });
-
 
 export const metadata: Metadata = {
   title: "FoodExpress",
