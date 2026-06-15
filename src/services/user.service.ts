@@ -19,22 +19,22 @@ const getSession = async () => {
   }
 };
 
-const verifyEmail = async(token: string) =>{
-  try {
+// const verifyEmail = async(token: string) =>{
+//   try {
     
-    const data = await re
-    if (res === null)
-      return { success: false, message: "Something went wrong" };
+//     const data = await re
+//     if (res === null)
+//       return { success: false, message: "Something went wrong" };
 
-     return { success: true, data: res };
+//      return { success: true, data: res };
 
   
     
-  } catch (error) {
-     return { success: false, error: "Something went wrong" };
+//   } catch (error) {
+//      return { success: false, error: "Something went wrong" };
     
-  }
-}
+//   }
+// }
 
 export const UserService = {
   getSession,
