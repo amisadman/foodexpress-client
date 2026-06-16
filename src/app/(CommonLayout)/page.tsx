@@ -1,18 +1,14 @@
-import { Button } from "@/components/ui/button";
-import Image from "next/image";
-import Icon from "./../icon.png";
-import { UserService } from "@/services/user.service";
+import HeroSection from "@/components/modules/home/HeroSection";
+import TopRestaurants from "@/components/modules/home/TopRestaurants";
+import TopMeals from "@/components/modules/home/TopMeals";
 
 export default async function Home() {
-  const session = await UserService.getSession();
-  console.log(session);
   return (
-    <div className="min-h-screen flex flex-col justify-center items-center">
-      <div>
-        <Image src={Icon} alt="logo" width={600} height={600} />
-      </div>
-      <div>
-        <Button>Click me</Button>
+    <div className="flex flex-col min-h-screen">
+      <HeroSection />
+      <div className="flex-1 w-full flex flex-col items-center">
+        <TopRestaurants />
+        <TopMeals />
       </div>
     </div>
   );
