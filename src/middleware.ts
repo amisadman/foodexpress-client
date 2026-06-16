@@ -4,17 +4,10 @@ import type { NextRequest } from "next/server";
 const ALLOWED_ROLE = ["USER", "ADMIN", "PROVIDER"];
 
 // Exact public routes
-const PUBLIC_ROUTES = [
-  "/login",
-  "/register",
-  "/",
-];
+const PUBLIC_ROUTES = ["/login", "/register", "/", "/verify-email"];
 
 // Prefix public routes
-const PUBLIC_PREFIXES = [
-  "/meals",
-  "/providers"
-];
+const PUBLIC_PREFIXES = ["/meals", "/providers"];
 
 // This function can be marked `async` if using `await` inside
 export async function middleware(request: NextRequest) {
@@ -32,14 +25,14 @@ export async function middleware(request: NextRequest) {
   try {
     const cookieHeader = request.headers.get("cookie") || "";
     const backendUrl = process.env.BACKEND_URL || "http://localhost:5000";
-    
+
     // We can fetch from get-session to verify authentication
     const res = await fetch(`${backendUrl}/api/auth/get-session`, {
       headers: {
         Cookie: cookieHeader,
       },
     });
-    
+
     if (res.ok) {
       const sessionData = await res.json();
       user = sessionData?.user;

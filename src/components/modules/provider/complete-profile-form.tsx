@@ -61,6 +61,7 @@ export function CompleteProfileForm({ ...props }: React.ComponentProps<typeof Ca
             }
           );
           const imgData = await imgRes.json();
+          console.log(imgData);
           if (imgData.success) {
             imageUrl = imgData.data.url;
           } else {
@@ -75,8 +76,9 @@ export function CompleteProfileForm({ ...props }: React.ComponentProps<typeof Ca
           ...value,
           ...(imageUrl && { image: imageUrl }),
         };
+        console.log("payload", payload);
 
-        const res = await fetch(`${env.NEXT_PUBLIC_SERVER_URL || "http://localhost:5000"}/api/v1/provider`, {
+        const res = await fetch(`${env.NEXT_PUBLIC_SERVER_URL || "http://localhost:5000"}/api/v1/providers`, {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
