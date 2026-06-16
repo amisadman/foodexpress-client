@@ -133,9 +133,14 @@ const USER_navMain = [
 
 interface AppSidebarProps extends React.ComponentProps<typeof Sidebar> {
   userRole?: "ADMIN" | "PROVIDER" | "USER" | string;
+  user?: {
+    name: string;
+    email: string;
+    avatar?: string;
+  } | null;
 }
 
-export function AppSidebar({ userRole, ...props }: AppSidebarProps) {
+export function AppSidebar({ userRole, user, ...props }: AppSidebarProps) {
   let navItem = USER_navMain; // fallback
   if (userRole === "ADMIN") {
     navItem = ADMIN_navMain;
@@ -150,7 +155,9 @@ export function AppSidebar({ userRole, ...props }: AppSidebarProps) {
         <NavMain items={navItem} />
         {/* <NavProjects projects={data.projects} /> */}
       </SidebarContent>
-      <SidebarFooter>{/* <NavUser user={data.user} /> */}</SidebarFooter>
+      <SidebarFooter>
+        {user && <NavUser user={user} />}
+      </SidebarFooter>
       <SidebarRail />
     </Sidebar>
   );

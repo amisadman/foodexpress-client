@@ -27,11 +27,12 @@ export default async function DashboardLayout({
   user: React.ReactNode;
 }) {
   const session = await UserService.getSession();
-  const role = session?.data?.user?.role;
+  const user = session?.data?.user;
+  const role = user?.role;
 
   return (
     <SidebarProvider>
-      <AppSidebar userRole={role} />
+      <AppSidebar userRole={role} user={user} />
       <SidebarInset>
         <header className="flex h-16 shrink-0 items-center gap-2 transition-[width,height] ease-linear group-has-data-[collapsible=icon]/sidebar-wrapper:h-12">
           <div className="flex items-center gap-2 px-4">
