@@ -16,53 +16,52 @@ import {
   FieldLabel,
 } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
-import { authClient } from "@/lib/auth-client";
 import { useForm } from "@tanstack/react-form";
 import { toast } from "sonner";
 import * as z from "zod";
 import { useRouter } from "next/navigation";
+import { env } from "../../../../env";
 
 const formSchema = z.object({
-  name: z.string().min(1, "Name is Required"),
-  password: z.string().min(8, "Minimum length is 8"),
-  email: z.email(),
-  role: z.enum(["USER", "PROVIDER"]),
+  name: z.string().min(1, "Name is required"),
+  location: z.string().min(1, "Location is required"),
+  description: z.string(),
 });
 
-export function RegisterForm({ ...props }: React.ComponentProps<typeof Card>) {
+export function CompleteProfileForm({ ...props }: React.ComponentProps<typeof Card>) {
   const router = useRouter();
-
-  const handleGoogleLogin = async () => {
-    const data = authClient.signIn.social({
-      provider: "google",
-      callbackURL: "http://localhost:3000",
-    });
-
-    console.log(data);
-  };
 
   const form = useForm({
     defaultValues: {
       name: "",
-      email: "",
-      password: "",
-      role: "USER" as "USER" | "PROVIDER",
+      location: "",
+      description: "",
     },
     validators: {
       onSubmit: formSchema,
     },
     onSubmit: async ({ value }) => {
-      const toastId = toast.loading("Registering Your Account");
+      const toastId = toast.loading("Saving Provider Profile");
       try {
-        const { data, error } = await authClient.signUp.email(value);
+        const res = await fetch(`${env.NEXT_PUBLIC_SERVER_URL || "http://localhost:5000"}/api/v1/providers`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(value),
+          credentials: "include", // Ensure session cookies are sent
+        });
 
-        if (error) {
-          toast.error(error.message, { id: toastId });
+        const data = await res.json();
+
+        if (!data.success) {
+          toast.error(data.message || "Failed to create profile", { id: toastId });
           return;
         }
 
-        toast.success("User Register in Successfully. Please verify your email and login.", { id: toastId });
-        router.push("/login");
+        toast.success("Profile completed successfully!", { id: toastId });
+        router.refresh();
+        router.push("/");
       } catch (err) {
         toast.error("Something went wrong, please try again.", { id: toastId });
       }
@@ -70,16 +69,16 @@ export function RegisterForm({ ...props }: React.ComponentProps<typeof Card>) {
   });
 
   return (
-    <Card {...props}>
+    <Card {...props} className="w-full max-w-lg mx-auto mt-10">
       <CardHeader>
-        <CardTitle>Create an account</CardTitle>
+        <CardTitle>Complete Provider Profile</CardTitle>
         <CardDescription>
-          Enter your information below to create your account
+          Tell us about your business to get started.
         </CardDescription>
       </CardHeader>
       <CardContent>
         <form
-          id="register-form"
+          id="complete-profile-form"
           onSubmit={(e) => {
             e.preventDefault();
             form.handleSubmit();
@@ -93,9 +92,8 @@ export function RegisterForm({ ...props }: React.ComponentProps<typeof Card>) {
                   field.state.meta.isTouched && !field.state.meta.isValid;
                 return (
                   <Field>
-                    <FieldLabel htmlFor={field.name}>Name</FieldLabel>
+                    <FieldLabel htmlFor={field.name}>Business Name</FieldLabel>
                     <Input
-                      type="name"
                       id={field.name}
                       name={field.name}
                       value={field.state.value}
@@ -109,15 +107,14 @@ export function RegisterForm({ ...props }: React.ComponentProps<typeof Card>) {
               }}
             />
             <form.Field
-              name="email"
+              name="location"
               children={(field) => {
                 const isInvalid =
                   field.state.meta.isTouched && !field.state.meta.isValid;
                 return (
                   <Field>
-                    <FieldLabel htmlFor={field.name}>Email</FieldLabel>
+                    <FieldLabel htmlFor={field.name}>Location</FieldLabel>
                     <Input
-                      type="email"
                       id={field.name}
                       name={field.name}
                       value={field.state.value}
@@ -131,45 +128,19 @@ export function RegisterForm({ ...props }: React.ComponentProps<typeof Card>) {
               }}
             />
             <form.Field
-              name="password"
+              name="description"
               children={(field) => {
                 const isInvalid =
                   field.state.meta.isTouched && !field.state.meta.isValid;
                 return (
                   <Field>
-                    <FieldLabel htmlFor={field.name}>Password</FieldLabel>
+                    <FieldLabel htmlFor={field.name}>Description</FieldLabel>
                     <Input
-                      type="password"
                       id={field.name}
                       name={field.name}
                       value={field.state.value}
                       onChange={(e) => field.handleChange(e.target.value)}
                     />
-                    {isInvalid && (
-                      <FieldError errors={field.state.meta.errors} />
-                    )}
-                  </Field>
-                );
-              }}
-            />
-            <form.Field
-              name="role"
-              children={(field) => {
-                const isInvalid =
-                  field.state.meta.isTouched && !field.state.meta.isValid;
-                return (
-                  <Field>
-                    <FieldLabel htmlFor={field.name}>Role</FieldLabel>
-                    <select
-                      id={field.name}
-                      name={field.name}
-                      value={field.state.value}
-                      onChange={(e) => field.handleChange(e.target.value as "USER" | "PROVIDER")}
-                      className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
-                    >
-                      <option value="USER">User</option>
-                      <option value="PROVIDER">Provider</option>
-                    </select>
                     {isInvalid && (
                       <FieldError errors={field.state.meta.errors} />
                     )}
@@ -181,16 +152,8 @@ export function RegisterForm({ ...props }: React.ComponentProps<typeof Card>) {
         </form>
       </CardContent>
       <CardFooter className="flex flex-col gap-5 justify-end">
-        <Button form="register-form" type="submit" className="w-full">
-          Register
-        </Button>
-        <Button
-          onClick={() => handleGoogleLogin()}
-          variant="outline"
-          type="button"
-          className="w-full"
-        >
-          Continue with Google
+        <Button form="complete-profile-form" type="submit" className="w-full">
+          Save Profile
         </Button>
       </CardFooter>
     </Card>

@@ -19,23 +19,22 @@ const getSession = async () => {
   }
 };
 
-// const verifyEmail = async(token: string) =>{
-//   try {
-    
-//     const data = await re
-//     if (res === null)
-//       return { success: false, message: "Something went wrong" };
-
-//      return { success: true, data: res };
-
-  
-    
-//   } catch (error) {
-//      return { success: false, error: "Something went wrong" };
-    
-//   }
-// }
+const getMe = async () => {
+  try {
+    const cookieStore = await cookies();
+    const res = await fetch(`${env.NEXT_PUBLIC_SERVER_URL}/api/v1/user/me`, {
+      headers: {
+        Cookie: cookieStore.toString(),
+      },
+    });
+    const data = await res.json();
+    return data;
+  } catch (error) {
+    return { success: false, error: "Something went wrong" };
+  }
+};
 
 export const UserService = {
   getSession,
+  getMe,
 };

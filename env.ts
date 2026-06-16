@@ -10,9 +10,11 @@ export const env = createEnv({
   },
   client: {
     NEXT_PUBLIC_BETTER_AUTH_URL: z.url(),
+    NEXT_PUBLIC_SERVER_URL: z.url(),
   },
   runtimeEnv: {
     BACKEND_URL: process.env.BACKEND_URL,
+    NEXT_PUBLIC_SERVER_URL: process.env.NEXT_PUBLIC_SERVER_URL,
     FRONTEND_URL: process.env.FRONTEND_URL,
     API_URL: process.env.API_URL,
     AUTH_URL: process.env.AUTH_URL,
