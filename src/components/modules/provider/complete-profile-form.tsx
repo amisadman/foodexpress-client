@@ -22,11 +22,15 @@ import * as z from "zod";
 import { useRouter } from "next/navigation";
 import { env } from "../../../../env";
 import { useState } from "react";
+import LocationPicker from "@/components/shared/LocationPicker";
+import { zodValidator } from "@tanstack/zod-form-adapter";
 
 const formSchema = z.object({
   name: z.string().min(1, "Name is required"),
   location: z.string().min(1, "Location is required"),
   description: z.string(),
+  latitude: z.number().optional(),
+  longitude: z.number().optional(),
 });
 
 export function CompleteProfileForm({ ...props }: React.ComponentProps<typeof Card>) {
@@ -38,7 +42,10 @@ export function CompleteProfileForm({ ...props }: React.ComponentProps<typeof Ca
       name: "",
       location: "",
       description: "",
-    },
+      latitude: undefined,
+      longitude: undefined,
+    } as z.infer<typeof formSchema>,
+    validatorAdapter: zodValidator(),
     validators: {
       onSubmit: formSchema,
     },
@@ -161,12 +168,13 @@ export function CompleteProfileForm({ ...props }: React.ComponentProps<typeof Ca
                   field.state.meta.isTouched && !field.state.meta.isValid;
                 return (
                   <Field>
-                    <FieldLabel htmlFor={field.name}>Location</FieldLabel>
+                    <FieldLabel htmlFor={field.name}>General Location</FieldLabel>
                     <Input
                       id={field.name}
                       name={field.name}
                       value={field.state.value}
                       onChange={(e) => field.handleChange(e.target.value)}
+                      placeholder="e.g. New York, NY"
                     />
                     {isInvalid && (
                       <FieldError errors={field.state.meta.errors} />
@@ -175,6 +183,30 @@ export function CompleteProfileForm({ ...props }: React.ComponentProps<typeof Ca
                 );
               }}
             />
+
+            <div className="flex flex-col space-y-2 pt-2 pb-1">
+              <FieldLabel>Pinpoint Exact Location on Map</FieldLabel>
+              <p className="text-xs text-muted-foreground mb-2">
+                Click on the map to set your restaurant's exact coordinates.
+              </p>
+              <form.Field
+                name="latitude"
+                children={(latField) => (
+                  <form.Field
+                    name="longitude"
+                    children={(lngField) => (
+                      <LocationPicker
+                        onLocationSelect={(lat, lng) => {
+                          latField.handleChange(lat);
+                          lngField.handleChange(lng);
+                        }}
+                      />
+                    )}
+                  />
+                )}
+              />
+            </div>
+
             <form.Field
               name="description"
               children={(field) => {
