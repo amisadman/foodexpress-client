@@ -2,13 +2,28 @@ import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 
 const ALLOWED_ROLE = ["USER", "ADMIN", "PROVIDER"];
-const PUBLIC_ROUTE = ["/login", "/register"];
+
+// Exact public routes
+const PUBLIC_ROUTES = [
+  "/login",
+  "/register",
+  "/",
+];
+
+// Prefix public routes
+const PUBLIC_PREFIXES = [
+  "/meals",
+  "/providers"
+];
 
 // This function can be marked `async` if using `await` inside
 export async function middleware(request: NextRequest) {
   const { pathname, origin } = request.nextUrl;
 
-  if (PUBLIC_ROUTE.includes(pathname)) {
+  if (
+    PUBLIC_ROUTES.includes(pathname) ||
+    PUBLIC_PREFIXES.some((prefix) => pathname.startsWith(prefix))
+  ) {
     return NextResponse.next();
   }
 

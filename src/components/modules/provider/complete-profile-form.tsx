@@ -21,6 +21,7 @@ import { toast } from "sonner";
 import * as z from "zod";
 import { useRouter } from "next/navigation";
 import { env } from "../../../../env";
+import { useState } from "react";
 
 const formSchema = z.object({
   name: z.string().min(1, "Name is required"),
@@ -30,6 +31,7 @@ const formSchema = z.object({
 
 export function CompleteProfileForm({ ...props }: React.ComponentProps<typeof Card>) {
   const router = useRouter();
+  const [imageFile, setImageFile] = useState<File | null>(null);
 
   const form = useForm({
     defaultValues: {
@@ -41,14 +43,45 @@ export function CompleteProfileForm({ ...props }: React.ComponentProps<typeof Ca
       onSubmit: formSchema,
     },
     onSubmit: async ({ value }) => {
-      const toastId = toast.loading("Saving Provider Profile");
+      const toastId = toast.loading("Saving Provider Profile...");
       try {
-        const res = await fetch(`${env.NEXT_PUBLIC_SERVER_URL || "http://localhost:5000"}/api/v1/providers`, {
+        let imageUrl = null;
+
+        // 1. Upload image to ImgBB if selected
+        if (imageFile) {
+          toast.loading("Uploading image...", { id: toastId });
+          const formData = new FormData();
+          formData.append("image", imageFile);
+
+          const imgRes = await fetch(
+            `https://api.imgbb.com/1/upload?key=${env.NEXT_PUBLIC_IMGBB_API_KEY}`,
+            {
+              method: "POST",
+              body: formData,
+            }
+          );
+          const imgData = await imgRes.json();
+          if (imgData.success) {
+            imageUrl = imgData.data.url;
+          } else {
+            throw new Error("Failed to upload image to ImgBB");
+          }
+        }
+
+        toast.loading("Creating profile...", { id: toastId });
+        
+        // 2. Submit to our backend
+        const payload = {
+          ...value,
+          ...(imageUrl && { image: imageUrl }),
+        };
+
+        const res = await fetch(`${env.NEXT_PUBLIC_SERVER_URL || "http://localhost:5000"}/api/v1/provider`, {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
           },
-          body: JSON.stringify(value),
+          body: JSON.stringify(payload),
           credentials: "include", // Ensure session cookies are sent
         });
 
@@ -62,8 +95,8 @@ export function CompleteProfileForm({ ...props }: React.ComponentProps<typeof Ca
         toast.success("Profile completed successfully!", { id: toastId });
         router.refresh();
         router.push("/");
-      } catch (err) {
-        toast.error("Something went wrong, please try again.", { id: toastId });
+      } catch (err: any) {
+        toast.error(err.message || "Something went wrong, please try again.", { id: toastId });
       }
     },
   });
@@ -85,6 +118,19 @@ export function CompleteProfileForm({ ...props }: React.ComponentProps<typeof Ca
           }}
         >
           <FieldGroup>
+            <div className="flex flex-col space-y-2">
+              <FieldLabel>Business Image (Optional)</FieldLabel>
+              <Input
+                type="file"
+                accept="image/*"
+                onChange={(e) => {
+                  if (e.target.files && e.target.files[0]) {
+                    setImageFile(e.target.files[0]);
+                  }
+                }}
+              />
+            </div>
+
             <form.Field
               name="name"
               children={(field) => {
